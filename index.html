@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PueriCalc – Síndrome Metabólica</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --pc-blue:#285A81;
+      --pc-soft:#B9E0E5;
+      --pc-bg:#F2F5F7;
+      --pc-line:#E7EDF2;
+      --pc-text:#1d2b36;
+      --pc-ok:#dff4e4;
+      --pc-warn:#fff3cd;
+      --pc-bad:#fde2e1;
+      --pc-neutral:#eef4f8;
+      --pc-white:#ffffff;
+      --shadow:0 10px 24px rgba(29,43,54,.08);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,#f8fbfc 0%, #eef4f7 100%);
+      color:var(--pc-text);
+      font-family:Arial, Helvetica, sans-serif;
+    }
+    .wrap{max-width:1280px;margin:0 auto;padding:20px}
+    .hero{
+      background:linear-gradient(135deg,var(--pc-blue) 0%, #3f79aa 100%);
+      color:#fff;border-radius:24px;padding:20px 22px;box-shadow:var(--shadow);margin-bottom:18px;
+    }
+    .hero h1{margin:0 0 6px;font-family:'Comfortaa',sans-serif;font-size:1.55rem;line-height:1.2}
+    .hero p{margin:0;opacity:.95}
+    .grid{display:grid;gap:16px}
+    .grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .card{background:var(--pc-white);border:1px solid var(--pc-line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+    .card h2{margin:0;padding:16px 18px;font-size:1rem;font-family:'Comfortaa',sans-serif;color:var(--pc-blue);border-left:6px solid var(--pc-blue);background:#fafcfd}
+    .card-body{padding:16px 18px}
+    .field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+    label{font-size:.92rem;font-weight:700;color:#2b4355}
+    input, select, textarea{width:100%;border:1px solid #cfd9e2;border-radius:12px;padding:11px 12px;font-size:.96rem;background:#fff;color:var(--pc-text)}
+    textarea{min-height:88px;resize:vertical}
+    .checkline{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:10px 12px;border:1px solid #d8e2ea;border-radius:12px;background:#fbfdff}
+    .checkline label{font-weight:600;margin:0;display:flex;align-items:center;gap:6px}
+    .checkline input[type="radio"], .checkline input[type="checkbox"]{width:auto;margin:0}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
+    button{border:none;border-radius:14px;padding:12px 16px;cursor:pointer;font-weight:700;font-size:.95rem}
+    .btn-primary{background:var(--pc-blue);color:#fff}
+    .btn-secondary{background:var(--pc-soft);color:#12344c}
+    .btn-light{background:#eef4f8;color:#20435c}
+    .result{border-radius:18px;padding:16px;border:1px solid var(--pc-line);margin-bottom:12px}
+    .ok{background:var(--pc-ok)} .warn{background:var(--pc-warn)} .bad{background:var(--pc-bad)} .neutral{background:var(--pc-neutral)}
+    .result h3{margin:0 0 8px;font-family:'Comfortaa',sans-serif;font-size:1rem}
+    .result p,.result li{margin:.28rem 0;line-height:1.45}
+    .list-tight{padding-left:18px;margin:.3rem 0}
+    .kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-top:10px}
+    .kpi{background:#f8fbfd;border:1px solid var(--pc-line);border-radius:16px;padding:12px}
+    .kpi .t{font-size:.82rem;color:#587082;margin-bottom:6px}
+    .kpi .v{font-size:1.05rem;font-weight:800;color:var(--pc-blue)}
+    .footer-note{font-size:.82rem;color:#5e7382;margin-top:14px;line-height:1.45}
+    @media (max-width:1000px){.grid-4,.grid-3,.grid-2,.kpis{grid-template-columns:1fr}}
+    @media print{ @page{size:A4;margin:10mm} body{background:#fff}.wrap{max-width:none;padding:0}.hero,.card{box-shadow:none}.actions{display:none} }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>PueriCalc – Síndrome Metabólica</h1>
+      <p>Dr. Wevelin Matos • Avaliação integrada de critérios diagnósticos, risco cardiometabólico e condutas iniciais.</p>
+    </section>
+
+    <div class="grid grid-2">
+      <section class="card">
+        <h2>Identificação</h2>
+        <div class="card-body grid grid-4">
+          <div class="field"><label for="idade">Idade (anos)</label><input id="idade" type="number" min="0" max="25" step="0.01"></div>
+          <div class="field"><label for="idadeMeses">Idade (meses)</label><input id="idadeMeses" type="number" min="0" max="300" step="0.1"></div>
+          <div class="field"><label for="sexo">Sexo</label><select id="sexo"><option value="">Selecione</option><option value="M">Masculino</option><option value="F">Feminino</option></select></div>
+          <div class="field"><label for="estagioPuberal">Estágio puberal global</label><select id="estagioPuberal"><option value="">Selecione</option><option value="pre">Pré-puberdade</option><option value="pub">Puberdade</option><option value="pos">Pós-puberdade</option></select></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Antropometria</h2>
+        <div class="card-body grid grid-4">
+          <div class="field"><label for="peso">Peso (kg)</label><input id="peso" type="number" min="0" step="0.1"></div>
+          <div class="field"><label for="estatura">Estatura (cm)</label><input id="estatura" type="number" min="0" step="0.1"></div>
+          <div class="field"><label for="imc">IMC (kg/m²)</label><input id="imc" type="text" readonly></div>
+          <div class="field"><label for="cintura">Circunferência abdominal (cm)</label><input id="cintura" type="number" min="0" step="0.1"></div>
+          <div class="field"><label for="rce">Relação cintura/estatura</label><input id="rce" type="text" readonly></div>
+          <div class="field"><label for="riscoRce">Risco pela relação cintura/estatura</label><input id="riscoRce" type="text" readonly></div>
+          <div class="field"><label for="caP50">CA P50 estimado</label><input id="caP50" type="text" readonly></div>
+          <div class="field"><label for="caP90">CA P90 estimado</label><input id="caP90" type="text" readonly></div>
+          <div class="field"><label for="cinturaP90">Classificação automática da CA (10–16 anos)</label><input id="cinturaP90" type="text" readonly></div>
+          <div class="field"><label for="imcP90">IMC P90 estimado</label><input id="imcP90" type="text" readonly></div>
+          <div class="field"><label for="imcP95">IMC P95 estimado</label><input id="imcP95" type="text" readonly></div>
+          <div class="field"><label for="imcP97">IMC P97 estimado</label><input id="imcP97" type="text" readonly></div>
+          <div class="field"><label for="imcClass">Classificação do IMC por percentis</label><input id="imcClass" type="text" readonly></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="grid grid-2" style="margin-top:16px;">
+      <section class="card">
+        <h2>Anamnese</h2>
+        <div class="card-body">
+          <div class="grid grid-2">
+            <div>
+              <div class="field"><label>HPP – DM2</label><div class="checkline"><label><input type="radio" name="hpp_dm2" value="Sim"> Sim</label><label><input type="radio" name="hpp_dm2" value="Não" checked> Não</label></div></div>
+              <div class="field"><label>HPP – HAS</label><div class="checkline"><label><input type="radio" name="hpp_has" value="Sim"> Sim</label><label><input type="radio" name="hpp_has" value="Não" checked> Não</label></div></div>
+              <div class="field"><label>HFam – DM2</label><div class="checkline"><label><input type="radio" name="hfam_dm2" value="Sim"> Sim</label><label><input type="radio" name="hfam_dm2" value="Não" checked> Não</label></div></div>
+              <div class="field"><label>HFam – HAS</label><div class="checkline"><label><input type="radio" name="hfam_has" value="Sim"> Sim</label><label><input type="radio" name="hfam_has" value="Não" checked> Não</label></div></div>
+              <div class="field"><label>HFam – Doença cardiovascular precoce em 1º grau</label><div class="checkline"><label><input type="radio" name="hfam_dcv" value="Sim"> Sim</label><label><input type="radio" name="hfam_dcv" value="Não" checked> Não</label></div></div>
+            </div>
+            <div>
+              <div class="field"><label>Sono – Ronco</label><div class="checkline"><label><input type="radio" name="sono_ronco" value="Sim"> Sim</label><label><input type="radio" name="sono_ronco" value="Não" checked> Não</label></div></div>
+              <div class="field"><label>Sono – Pausa respiratória</label><div class="checkline"><label><input type="radio" name="sono_pausa" value="Sim"> Sim</label><label><input type="radio" name="sono_pausa" value="Não" checked> Não</label></div></div>
+              <div class="field"><label for="raca">Raça</label><select id="raca"><option value="">Selecione</option><option value="branco">Branco(a)</option><option value="negro">Negro(a)</option></select></div>
+              <div class="field"><label for="tela">Tela (horas/dia ou “livre”)</label><input id="tela" type="text" placeholder="Ex.: 4 h/dia ou livre"></div>
+              <div class="field"><label for="atividade">Atividade física</label><textarea id="atividade" placeholder="Ex.: Vôlei 2x2h/sem"></textarea></div>
+            </div>
+          </div>
+          <div class="grid grid-3">
+            <div class="field"><label for="alim_prot">Proteína</label><select id="alim_prot"><option value="">Selecione</option><option>Baixo</option><option>Adequado</option><option>Excesso</option></select></div>
+            <div class="field"><label for="alim_carb">Carboidrato</label><select id="alim_carb"><option value="">Selecione</option><option>Baixo</option><option>Adequado</option><option>Excesso</option></select></div>
+            <div class="field"><label for="alim_lip">Lipídeo</label><select id="alim_lip"><option value="">Selecione</option><option>Baixo</option><option>Adequado</option><option>Excesso</option></select></div>
+            <div class="field"><label for="alim_vm">Vitaminas e minerais</label><select id="alim_vm"><option value="">Selecione</option><option>Baixo</option><option>Adequado</option><option>Excesso</option></select></div>
+            <div class="field"><label for="alim_agua">Água</label><select id="alim_agua"><option value="">Selecione</option><option>Baixo</option><option>Adequado</option><option>Excesso</option></select></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Exame físico</h2>
+        <div class="card-body grid grid-4">
+          <div class="field"><label for="pas">PAS (mmHg)</label><input id="pas" type="number" min="0" step="1"></div>
+          <div class="field"><label for="pad">PAD (mmHg)</label><input id="pad" type="number" min="0" step="1"></div>
+          <div class="field"><label for="alturaPercentil">Percentil de altura</label><select id="alturaPercentil"><option value="">Selecione</option><option value="5">5</option><option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="75">75</option><option value="90">90</option><option value="95">95</option></select></div>
+          <div class="field"><label for="paP90Sis">PAS P90 estimada</label><input id="paP90Sis" type="text" readonly></div>
+          <div class="field"><label for="paP90Dia">PAD P90 estimada</label><input id="paP90Dia" type="text" readonly></div>
+          <div class="field"><label for="paP90">Classificação automática da PA (10–16 anos)</label><input id="paP90" type="text" readonly></div>
+          <div class="field"><label>Acantose nigricans</label><div class="checkline"><label><input type="radio" name="acantose" value="Sim"> Sim</label><label><input type="radio" name="acantose" value="Não" checked> Não</label></div></div>
+          <div class="field"><label for="tanner1">Tanner</label><input id="tanner1" type="text" placeholder="Menino: Gx / Menina: Mx"></div>
+          <div class="field"><label for="tanner2">Tanner complementar</label><input id="tanner2" type="text" placeholder="Px"></div>
+        </div>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top:16px;">
+      <h2>Laboratório</h2>
+      <div class="card-body grid grid-4">
+        <div class="field"><label for="ct">Colesterol total (mg/dL)</label><input id="ct" type="number" min="0" step="0.1"></div>
+        <div class="field"><label for="hdl">HDL-c (mg/dL)</label><input id="hdl" type="number" min="0" step="0.1"></div>
+        <div class="field"><label for="ldl">LDL-c (mg/dL)</label><input id="ldl" type="number" min="0" step="0.1"></div>
+        <div class="field"><label for="tg">Triglicerídeos (mg/dL)</label><input id="tg" type="number" min="0" step="0.1"></div>
+        <div class="field"><label for="glicemia">Glicemia de jejum (mg/dL)</label><input id="glicemia" type="number" min="0" step="0.1"></div>
+        <div class="field"><label>Diabetes mellitus tipo 2 já diagnosticado</label><div class="checkline"><label><input type="radio" name="dm2_diag" value="Sim"> Sim</label><label><input type="radio" name="dm2_diag" value="Não" checked> Não</label></div></div>
+        <div class="field"><label for="ast">TGO / AST (U/L)</label><input id="ast" type="number" min="0" step="0.1"></div>
+        <div class="field"><label for="alt">TGP / ALT (U/L)</label><input id="alt" type="number" min="0" step="0.1"></div>
+        <div class="field"><label for="insulina">Insulina de jejum (µUI/mL)</label><input id="insulina" type="number" min="0" step="0.01"></div>
+        <div class="field"><label for="homa">HOMA-IR</label><input id="homa" type="text" readonly></div>
+        <div class="field"><label for="homaClass">Classificação do HOMA-IR</label><input id="homaClass" type="text" readonly></div>
+      </div>
+    </section>
+
+    <div class="actions">
+      <button class="btn-primary" onclick="analisar()">Gerar / Atualizar análise</button>
+      <button class="btn-secondary" onclick="preencherExemplo()">Preencher exemplo</button>
+      <button class="btn-light" onclick="window.print()">Gerar PDF / Imprimir</button>
+      <button class="btn-light" onclick="limparTudo()">Limpar</button>
+    </div>
+
+    <section class="card">
+      <h2>Resultados e condutas</h2>
+      <div class="card-body">
+        <div id="kpis" class="kpis">
+          <div class="kpi"><div class="t">Faixa etária</div><div class="v" id="kpiFaixa">—</div></div>
+          <div class="kpi"><div class="t">IMC</div><div class="v" id="kpiImc">—</div></div>
+          <div class="kpi"><div class="t">RCEst</div><div class="v" id="kpiRce">—</div></div>
+          <div class="kpi"><div class="t">IMC percentil</div><div class="v" id="kpiImcClass">—</div></div>
+          <div class="kpi"><div class="t">HOMA-IR</div><div class="v" id="kpiHoma">—</div></div>
+          <div class="kpi"><div class="t">Critérios positivos</div><div class="v" id="kpiCrit">—</div></div>
+        </div>
+        <div id="saida" style="margin-top:16px;"></div>
+        <div class="footer-note">Versão autossuficiente: circunferência abdominal pediátrica automatizada por idade, sexo e raça; pressão arterial pediátrica automatizada por idade, sexo e percentil de altura; IMC automatizado por idade em meses e sexo com interpolação linear entre pontos P90, P95 e P97. Não depende de complementação manual para funcionar.</div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    const getRadio = name => document.querySelector(`input[name="${name}"]:checked`)?.value || '';
+    const num = id => { const v = parseFloat($(id).value); return Number.isFinite(v) ? v : null; };
+    const fmt = (v, d=2) => Number.isFinite(v) ? v.toFixed(d).replace('.',',') : '—';
+
+    const CA_TABLE = {
+      branco:{M:{5:{p50:52,p90:59},6:{p50:54,p90:61},7:{p50:55,p90:61},8:{p50:59,p90:75},9:{p50:62,p90:77},10:{p50:64,p90:88},11:{p50:68,p90:90},12:{p50:70,p90:89},13:{p50:77,p90:95},14:{p50:73,p90:99},15:{p50:73,p90:99},16:{p50:77,p90:97},17:{p50:79,p90:90}},F:{5:{p50:51,p90:57},6:{p50:53,p90:60},7:{p50:54,p90:64},8:{p50:58,p90:73},9:{p50:60,p90:73},10:{p50:63,p90:75},11:{p50:66,p90:83},12:{p50:67,p90:83},13:{p50:69,p90:94},14:{p50:69,p90:96},15:{p50:69,p90:88},16:{p50:68,p90:93},17:{p50:66,p90:86}}},
+      negro:{M:{5:{p50:52,p90:56},6:{p50:54,p90:60},7:{p50:56,p90:61},8:{p50:58,p90:67},9:{p50:60,p90:74},10:{p50:64,p90:79},11:{p50:64,p90:79},12:{p50:68,p90:87},13:{p50:68,p90:87},14:{p50:72,p90:85},15:{p50:72,p90:81},16:{p50:75,p90:91},17:{p50:78,p90:101}},F:{5:{p50:52,p90:56},6:{p50:53,p90:59},7:{p50:56,p90:67},8:{p50:58,p90:65},9:{p50:61,p90:78},10:{p50:62,p90:79},11:{p50:67,p90:87},12:{p50:67,p90:84},13:{p50:67,p90:81},14:{p50:68,p90:92},15:{p50:72,p90:85},16:{p50:75,p90:90},17:{p50:71,p90:105}}}
+    };
+
+    const BP_P90_TABLE = {
+      M:{1:{5:{sys:94,dia:49},10:{sys:95,dia:50},25:{sys:97,dia:51},50:{sys:99,dia:52},75:{sys:100,dia:53},90:{sys:102,dia:53},95:{sys:103,dia:54}},2:{5:{sys:97,dia:54},10:{sys:99,dia:55},25:{sys:100,dia:56},50:{sys:102,dia:57},75:{sys:104,dia:58},90:{sys:105,dia:58},95:{sys:106,dia:59}},3:{5:{sys:100,dia:59},10:{sys:101,dia:59},25:{sys:103,dia:60},50:{sys:105,dia:61},75:{sys:107,dia:62},90:{sys:108,dia:63},95:{sys:109,dia:63}},4:{5:{sys:102,dia:62},10:{sys:103,dia:63},25:{sys:105,dia:64},50:{sys:107,dia:65},75:{sys:109,dia:66},90:{sys:110,dia:66},95:{sys:111,dia:67}},5:{5:{sys:104,dia:65},10:{sys:105,dia:66},25:{sys:106,dia:67},50:{sys:108,dia:68},75:{sys:110,dia:69},90:{sys:111,dia:69},95:{sys:112,dia:70}},6:{5:{sys:105,dia:68},10:{sys:106,dia:68},25:{sys:108,dia:69},50:{sys:110,dia:70},75:{sys:111,dia:71},90:{sys:113,dia:72},95:{sys:113,dia:72}},7:{5:{sys:106,dia:70},10:{sys:107,dia:70},25:{sys:109,dia:71},50:{sys:111,dia:72},75:{sys:113,dia:73},90:{sys:114,dia:74},95:{sys:115,dia:74}},8:{5:{sys:107,dia:71},10:{sys:109,dia:72},25:{sys:110,dia:72},50:{sys:112,dia:73},75:{sys:114,dia:74},90:{sys:115,dia:75},95:{sys:116,dia:76}},9:{5:{sys:109,dia:72},10:{sys:110,dia:73},25:{sys:112,dia:74},50:{sys:114,dia:75},75:{sys:115,dia:76},90:{sys:117,dia:76},95:{sys:118,dia:77}},10:{5:{sys:111,dia:73},10:{sys:112,dia:73},25:{sys:114,dia:74},50:{sys:115,dia:75},75:{sys:117,dia:76},90:{sys:119,dia:77},95:{sys:119,dia:78}},11:{5:{sys:113,dia:74},10:{sys:114,dia:75},25:{sys:115,dia:75},50:{sys:117,dia:76},75:{sys:119,dia:77},90:{sys:120,dia:78},95:{sys:121,dia:78}},12:{5:{sys:115,dia:74},10:{sys:116,dia:75},25:{sys:118,dia:75},50:{sys:120,dia:76},75:{sys:121,dia:77},90:{sys:123,dia:78},95:{sys:123,dia:79}},13:{5:{sys:117,dia:75},10:{sys:118,dia:75},25:{sys:120,dia:76},50:{sys:122,dia:77},75:{sys:124,dia:78},90:{sys:125,dia:79},95:{sys:126,dia:79}},14:{5:{sys:120,dia:75},10:{sys:121,dia:76},25:{sys:123,dia:77},50:{sys:125,dia:78},75:{sys:126,dia:79},90:{sys:128,dia:79},95:{sys:128,dia:80}},15:{5:{sys:122,dia:76},10:{sys:124,dia:77},25:{sys:125,dia:78},50:{sys:127,dia:79},75:{sys:129,dia:80},90:{sys:130,dia:80},95:{sys:131,dia:81}},16:{5:{sys:125,dia:78},10:{sys:126,dia:78},25:{sys:128,dia:79},50:{sys:130,dia:80},75:{sys:131,dia:81},90:{sys:133,dia:82},95:{sys:134,dia:82}},17:{5:{sys:127,dia:80},10:{sys:128,dia:80},25:{sys:130,dia:81},50:{sys:132,dia:82},75:{sys:134,dia:83},90:{sys:135,dia:84},95:{sys:136,dia:84}}},
+      F:{1:{5:{sys:97,dia:52},10:{sys:97,dia:53},25:{sys:98,dia:53},50:{sys:100,dia:54},75:{sys:101,dia:55},90:{sys:102,dia:55},95:{sys:103,dia:56}},2:{5:{sys:98,dia:57},10:{sys:99,dia:58},25:{sys:100,dia:58},50:{sys:101,dia:59},75:{sys:103,dia:60},90:{sys:104,dia:61},95:{sys:105,dia:61}},3:{5:{sys:100,dia:61},10:{sys:100,dia:62},25:{sys:102,dia:62},50:{sys:103,dia:62},75:{sys:104,dia:63},90:{sys:106,dia:64},95:{sys:106,dia:65}},4:{5:{sys:101,dia:64},10:{sys:102,dia:64},25:{sys:103,dia:65},50:{sys:104,dia:66},75:{sys:106,dia:67},90:{sys:107,dia:67},95:{sys:108,dia:68}},5:{5:{sys:103,dia:66},10:{sys:103,dia:67},25:{sys:105,dia:67},50:{sys:106,dia:68},75:{sys:107,dia:69},90:{sys:109,dia:69},95:{sys:109,dia:70}},6:{5:{sys:104,dia:68},10:{sys:105,dia:68},25:{sys:106,dia:69},50:{sys:108,dia:70},75:{sys:109,dia:70},90:{sys:110,dia:71},95:{sys:111,dia:72}},7:{5:{sys:106,dia:69},10:{sys:107,dia:70},25:{sys:108,dia:70},50:{sys:109,dia:71},75:{sys:111,dia:72},90:{sys:112,dia:72},95:{sys:113,dia:73}},8:{5:{sys:108,dia:71},10:{sys:109,dia:71},25:{sys:110,dia:71},50:{sys:111,dia:72},75:{sys:113,dia:73},90:{sys:114,dia:74},95:{sys:114,dia:74}},9:{5:{sys:110,dia:72},10:{sys:110,dia:72},25:{sys:112,dia:72},50:{sys:113,dia:73},75:{sys:114,dia:74},90:{sys:116,dia:75},95:{sys:116,dia:75}},10:{5:{sys:112,dia:73},10:{sys:112,dia:73},25:{sys:114,dia:73},50:{sys:115,dia:74},75:{sys:116,dia:75},90:{sys:118,dia:76},95:{sys:118,dia:76}},11:{5:{sys:114,dia:74},10:{sys:114,dia:74},25:{sys:116,dia:74},50:{sys:117,dia:75},75:{sys:118,dia:76},90:{sys:119,dia:77},95:{sys:120,dia:77}},12:{5:{sys:116,dia:75},10:{sys:116,dia:75},25:{sys:117,dia:75},50:{sys:119,dia:76},75:{sys:120,dia:77},90:{sys:121,dia:78},95:{sys:122,dia:78}},13:{5:{sys:117,dia:76},10:{sys:118,dia:76},25:{sys:119,dia:76},50:{sys:121,dia:77},75:{sys:122,dia:78},90:{sys:123,dia:79},95:{sys:124,dia:79}},14:{5:{sys:119,dia:77},10:{sys:120,dia:77},25:{sys:121,dia:77},50:{sys:122,dia:78},75:{sys:124,dia:79},90:{sys:125,dia:80},95:{sys:125,dia:80}},15:{5:{sys:120,dia:78},10:{sys:121,dia:78},25:{sys:122,dia:78},50:{sys:123,dia:79},75:{sys:125,dia:80},90:{sys:126,dia:81},95:{sys:127,dia:81}},16:{5:{sys:121,dia:78},10:{sys:122,dia:78},25:{sys:123,dia:79},50:{sys:124,dia:80},75:{sys:126,dia:81},90:{sys:127,dia:81},95:{sys:128,dia:82}},17:{5:{sys:122,dia:78},10:{sys:122,dia:79},25:{sys:123,dia:79},50:{sys:125,dia:80},75:{sys:126,dia:81},90:{sys:127,dia:81},95:{sys:128,dia:82}}}
+    };
+
+    const BMI_PERCENTILE_TABLE = {
+      M:{24:{p90:18.6095,p95:19.338,p97:19.8599},36.5:{p90:17.6802,p95:18.2384,p97:18.6245},48.5:{p90:17.2766,p95:17.8361,p97:18.2269},60.5:{p90:17.2534,p95:17.9389,p97:18.4411},72.5:{p90:17.5234,p95:18.4142,p97:19.1088},84.5:{p90:18.0218,p95:19.1524,p97:20.0805},96.5:{p90:18.6923,p95:20.0679,p97:21.2353},108.5:{p90:19.4815,p95:21.0889,p97:22.4767},120.5:{p90:20.3427,p95:22.1541,p97:23.727},132.5:{p90:21.2368,p95:23.2136,p97:24.9263},144.5:{p90:22.1329,p95:24.2298,p97:26.0323},156.5:{p90:23.0084,p95:25.1781,p97:27.0205},168.5:{p90:23.8489,p95:26.0466,p97:27.8844},180.5:{p90:24.6478,p95:26.8369,p97:28.6358},192.5:{p90:25.4067,p95:27.5639,p97:29.3049},204.5:{p90:26.1351,p95:28.2568,p97:29.941},216.5:{p90:26.8512,p95:28.9586,p97:30.6114},228.5:{p90:27.5816,p95:29.7267,p97:31.4015},240.5:{p90:28.3617,p95:30.6311,p97:32.4134}},
+      F:{24:{p90:18.4414,p95:19.1062,p97:19.5641},36.5:{p90:17.5802,p95:18.2548,p97:18.7384},48.5:{p90:17.2542,p95:18.0285,p97:18.6144},60.5:{p90:17.3266,p95:18.2574,p97:18.9962},72.5:{p90:17.7168,p95:18.8378,p97:19.7546},84.5:{p90:18.3487,p95:19.6779,p97:20.7807},96.5:{p90:19.1526,p95:20.6953,p97:21.9813},108.5:{p90:20.0665,p95:21.8173,p97:23.2771},120.5:{p90:21.0367,p95:22.9826,p97:24.6033},132.5:{p90:22.0183,p95:24.1414,p97:25.9087},144.5:{p90:22.9749,p95:25.2556,p97:27.156},156.5:{p90:23.879,p95:26.2988,p97:28.3219},168.5:{p90:24.7114,p95:27.256,p97:29.3969},180.5:{p90:25.462,p95:28.1237,p97:30.3852},192.5:{p90:26.1295,p95:28.9098,p97:31.3046},204.5:{p90:26.7212,p95:29.6335,p97:32.186},216.5:{p90:27.2543,p95:30.3255,p97:33.0732},228.5:{p90:27.755,p95:31.0288,p97:34.023},240.5:{p90:28.2589,p95:31.799,p97:35.1056}}
+    };
+
+    function idadeAnosParaMeses(idadeAnos){ return Number.isFinite(idadeAnos) ? idadeAnos * 12 : null; }
+    function faixaEtaria(idade){ if(idade === null) return 'Indefinida'; if(idade < 10) return '< 10 anos'; if(idade <= 16) return '10–16 anos'; return '> 16 anos'; }
+
+    function calcIMC(){
+      const peso = num('peso'), est = num('estatura');
+      if(peso && est){ const m = est/100; const imc = peso/(m*m); $('imc').value = fmt(imc); $('kpiImc').textContent = fmt(imc,1); return imc; }
+      $('imc').value=''; $('kpiImc').textContent='—'; return null;
+    }
+
+    function calcRCE(){
+      const cintura = num('cintura'), est = num('estatura');
+      if(cintura && est){ const r = cintura/est; $('rce').value = fmt(r,3); $('riscoRce').value = r >= 0.5 ? 'Risco aumentado' : 'Sem risco aumentado por este critério'; $('kpiRce').textContent = fmt(r,2); return r; }
+      $('rce').value=''; $('riscoRce').value=''; $('kpiRce').textContent='—'; return null;
+    }
+
+    function calcHoma(){
+      const glic = num('glicemia'), ins = num('insulina'), idade = num('idade'), pub = $('estagioPuberal').value;
+      if(glic && ins){
+        const homa = (glic * ins)/405; $('homa').value = fmt(homa,2); $('kpiHoma').textContent = fmt(homa,2);
+        let cls = 'Sem classificação definida';
+        if(idade !== null && idade > 16){ if(homa < 2.0) cls = 'Normal'; else if(homa <= 2.5) cls = 'Zona de alerta'; else cls = 'Resistência à insulina'; }
+        else { if(pub === 'pub') cls = homa < 3.22 ? 'Normal para puberdade' : 'Acima do esperado para puberdade'; else if(pub === 'pos') cls = homa < 2.91 ? 'Normal para pós-puberdade' : 'Acima do esperado para pós-puberdade'; else if(pub === 'pre') cls = 'Interpretar com cautela na pré-puberdade'; else cls = 'Selecione o estágio puberal para classificar'; }
+        $('homaClass').value = cls; return {homa, cls};
+      }
+      $('homa').value=''; $('homaClass').value=''; $('kpiHoma').textContent='—'; return null;
+    }
+
+    function calcCAPercentil(){
+      const idade = Math.round(num('idade')), sexo = $('sexo').value, raca = $('raca').value, cintura = num('cintura');
+      $('caP50').value=''; $('caP90').value=''; $('cinturaP90').value='';
+      if(!Number.isFinite(idade) || !sexo || !raca || !CA_TABLE[raca]?.[sexo]?.[idade]) return null;
+      const row = CA_TABLE[raca][sexo][idade];
+      $('caP50').value = fmt(row.p50,0)+' cm'; $('caP90').value = fmt(row.p90,0)+' cm';
+      if(cintura === null){ $('cinturaP90').value = 'Informe a cintura abdominal'; return {...row, acimaP90:null}; }
+      const acima = cintura >= row.p90; $('cinturaP90').value = acima ? 'CA ≥ P90' : 'CA < P90'; return {...row, acimaP90:acima};
+    }
+
+    function calcPAPercentil(){
+      const idade = Math.round(num('idade')), sexo = $('sexo').value, altPct = $('alturaPercentil').value, pas = num('pas'), pad = num('pad');
+      $('paP90Sis').value=''; $('paP90Dia').value=''; $('paP90').value='';
+      if(!Number.isFinite(idade) || !sexo || !altPct) return null;
+      const row = BP_P90_TABLE?.[sexo]?.[idade]?.[altPct];
+      if(!row){ $('paP90').value = 'Sem referência para esta combinação'; return null; }
+      $('paP90Sis').value = fmt(row.sys,0)+' mmHg'; $('paP90Dia').value = fmt(row.dia,0)+' mmHg';
+      if(pas === null && pad === null){ $('paP90').value = 'Informe PAS/PAD'; return {...row, acimaP90:null}; }
+      const acima = (pas !== null && pas >= row.sys) || (pad !== null && pad >= row.dia); $('paP90').value = acima ? 'PA ≥ P90' : 'PA < P90'; return {...row, acimaP90:acima};
+    }
+
+    function interpolateBMIcutoffs(sexo, idadeMeses){
+      const data = BMI_PERCENTILE_TABLE[sexo];
+      $('imcP90').value=''; $('imcP95').value=''; $('imcP97').value=''; $('imcClass').value=''; $('kpiImcClass').textContent='—';
+      if(!data || !Number.isFinite(idadeMeses)) return null;
+      const pts = Object.keys(data).map(Number).sort((a,b)=>a-b);
+      if(idadeMeses <= pts[0]) return data[pts[0]];
+      if(idadeMeses >= pts[pts.length-1]) return data[pts[pts.length-1]];
+      let lower = pts[0], upper = pts[pts.length-1];
+      for(let i=0;i<pts.length-1;i++){ if(idadeMeses >= pts[i] && idadeMeses <= pts[i+1]){ lower = pts[i]; upper = pts[i+1]; break; } }
+      const low = data[lower], high = data[upper], frac = (idadeMeses - lower)/(upper - lower);
+      return { p90: low.p90 + (high.p90-low.p90)*frac, p95: low.p95 + (high.p95-low.p95)*frac, p97: low.p97 + (high.p97-low.p97)*frac };
+    }
+
+    function calcIMCPercentil(){
+      const sexo = $('sexo').value;
+      let idadeMeses = num('idadeMeses');
+      const idadeAnos = num('idade');
+      const imc = num('imc'.replace('imc','imc')) || parseFloat(($('imc').value||'').replace(',','.'));
+      if(idadeMeses === null && idadeAnos !== null){ idadeMeses = idadeAnosParaMeses(idadeAnos); $('idadeMeses').value = fmt(idadeMeses,1).replace(',','.'); }
+      const ref = interpolateBMIcutoffs(sexo, idadeMeses);
+      if(!ref || !Number.isFinite(imc)) return null;
+      $('imcP90').value = fmt(ref.p90,2); $('imcP95').value = fmt(ref.p95,2); $('imcP97').value = fmt(ref.p97,2);
+      let classificacao = 'Abaixo de P90';
+      if(imc >= ref.p97) classificacao = '≥ P97'; else if(imc >= ref.p95) classificacao = '≥ P95'; else if(imc >= ref.p90) classificacao = '≥ P90';
+      $('imcClass').value = classificacao; $('kpiImcClass').textContent = classificacao;
+      return {...ref, classificacao, idadeMeses};
+    }
+
+    function getNutriFlags(){
+      const items = [['Proteína',$('alim_prot').value],['Carboidrato',$('alim_carb').value],['Lipídeo',$('alim_lip').value],['Vitaminas e minerais',$('alim_vm').value],['Água',$('alim_agua').value]];
+      return items.filter(([_,v]) => v && v !== 'Adequado').map(([n,v]) => `${n}: ${v}`);
+    }
+
+    function cardResult(cls,title,text){ return `<div class="result ${cls}"><h3>${title}</h3><p>${text}</p></div>`; }
+    function cardList(title,arr,cls='neutral'){ return `<div class="result ${cls}"><h3>${title}</h3><ul class="list-tight">${arr.map(i=>`<li>${i}</li>`).join('')}</ul></div>`; }
+
+    function analisar(){
+      const idade = num('idade'), sexo = $('sexo').value, cintura = num('cintura'), pas = num('pas'), pad = num('pad'), tg = num('tg'), hdl = num('hdl'), glic = num('glicemia');
+      const dm2Diag = getRadio('dm2_diag') === 'Sim';
+      const imc = calcIMC(), rce = calcRCE(), homaRes = calcHoma(), caRef = calcCAPercentil(), paRef = calcPAPercentil(), imcRef = calcIMCPercentil();
+      const faixa = faixaEtaria(idade); $('kpiFaixa').textContent = faixa;
+      if(idade === null || !sexo){ $('saida').innerHTML = cardResult('neutral','Preencha idade e sexo para iniciar a análise.','Inclua os dados mínimos para cálculo e classificação diagnóstica.'); return; }
+
+      const acantose = getRadio('acantose') === 'Sim', ronco = getRadio('sono_ronco') === 'Sim', pausa = getRadio('sono_pausa') === 'Sim';
+      const hfDm2 = getRadio('hfam_dm2') === 'Sim', hfHas = getRadio('hfam_has') === 'Sim', hfDcv = getRadio('hfam_dcv') === 'Sim';
+      const hppDm2 = getRadio('hpp_dm2') === 'Sim', hppHas = getRadio('hpp_has') === 'Sim';
+      let crit=[], resumo=[], condutas=[], alertas=[], cor='neutral', titulo='Avaliação incompleta', diagnostico='Dados insuficientes para conclusão completa.', nCrit=0;
+
+      if(idade >= 10 && idade <= 16){
+        const ca = caRef ? caRef.acimaP90 === true : false;
+        const pa = paRef ? paRef.acimaP90 === true : false;
+        const tgCrit = tg !== null && tg >= 150;
+        const hdlCrit = hdl !== null && hdl <= 40;
+        const glicCrit = (glic !== null && glic >= 100) || dm2Diag;
+        if(ca) crit.push('Circunferência abdominal ≥ P90');
+        if(tgCrit) crit.push('Triglicerídeos ≥ 150 mg/dL');
+        if(hdlCrit) crit.push('HDL-c ≤ 40 mg/dL');
+        if(pa) crit.push('PA ≥ P90 para sexo/estatura');
+        if(glicCrit) crit.push('Glicemia de jejum ≥ 100 mg/dL ou DM2');
+        const adicionais = [tgCrit, hdlCrit, pa, glicCrit].filter(Boolean).length; nCrit = (ca?1:0) + adicionais;
+        if(ca && adicionais >= 2){ titulo='Critérios preenchidos para síndrome metabólica'; diagnostico=`Faixa 10–16 anos: circunferência abdominal ≥ P90 associada a ${adicionais} critério(s) adicional(is).`; cor='bad'; }
+        else if(ca && adicionais === 1){ titulo='Risco cardiometabólico aumentado'; diagnostico='Há obesidade abdominal com 1 critério adicional; ainda sem preencher definição diagnóstica completa de síndrome metabólica.'; cor='warn'; }
+        else { titulo='Sem critérios completos para síndrome metabólica'; diagnostico='Critérios pediátricos completos não foram preenchidos com os dados atuais.'; cor='ok'; }
+        if(!caRef) alertas.push('Informar raça, sexo, idade e cintura abdominal para classificação automática da CA.');
+        if(!paRef) alertas.push('Informar sexo, idade, percentil de altura e PAS/PAD para classificação automática da PA pediátrica.');
+      } else if(idade > 16){
+        const caCrit = sexo === 'M' ? (cintura !== null && cintura >= 102) : (cintura !== null && cintura >= 88);
+        const tgCrit = tg !== null && tg >= 150;
+        const hdlCrit = sexo === 'M' ? (hdl !== null && hdl <= 40) : (hdl !== null && hdl <= 50);
+        const paCrit = (pas !== null && pas >= 130) || (pad !== null && pad >= 85);
+        const glicCrit = (glic !== null && glic >= 100) || dm2Diag;
+        if(caCrit) crit.push(sexo === 'M' ? 'CA ≥ 102 cm' : 'CA ≥ 88 cm');
+        if(tgCrit) crit.push('Triglicerídeos ≥ 150 mg/dL');
+        if(hdlCrit) crit.push(sexo === 'M' ? 'HDL-c ≤ 40 mg/dL' : 'HDL-c ≤ 50 mg/dL');
+        if(paCrit) crit.push('PA ≥ 130/85 mmHg');
+        if(glicCrit) crit.push('Glicemia de jejum ≥ 100 mg/dL ou DM2');
+        nCrit = crit.length;
+        if(nCrit >= 3){ titulo='Critérios preenchidos para síndrome metabólica'; diagnostico=`Faixa > 16 anos: ${nCrit} de 5 critérios diagnósticos presentes.`; cor='bad'; }
+        else if(nCrit === 2){ titulo='Risco cardiometabólico aumentado'; diagnostico='Dois critérios presentes; sem preencher definição diagnóstica formal no momento.'; cor='warn'; }
+        else { titulo='Sem critérios completos para síndrome metabólica'; diagnostico='Menos de 3 critérios presentes com os dados atuais.'; cor='ok'; }
+      } else {
+        titulo='Faixa etária fora do algoritmo principal'; diagnostico='Os critérios estruturados nesta versão contemplam 10–16 anos e >16 anos.'; cor='neutral'; nCrit = crit.length;
+      }
+
+      $('kpiCrit').textContent = String(nCrit);
+      if(rce !== null) resumo.push(rce >= 0.5 ? 'Relação cintura/estatura com risco aumentado (≥ 0,5).' : 'Relação cintura/estatura abaixo de 0,5.');
+      if(imcRef) resumo.push(`IMC por idade: P90 ${fmt(imcRef.p90,2)}, P95 ${fmt(imcRef.p95,2)}, P97 ${fmt(imcRef.p97,2)}; classificação ${imcRef.classificacao}.`);
+      if(acantose) resumo.push('Presença de acantose nigricans, sugerindo maior chance de resistência insulínica.');
+      if(ronco || pausa) resumo.push('Rastreio clínico sugere distúrbio respiratório do sono; considerar investigação direcionada.');
+      if(hfDm2 || hfHas || hfDcv) resumo.push('Antecedentes familiares cardiometabólicos relevantes presentes.');
+      if(hppDm2 || hppHas) resumo.push('História patológica pregressa comorbida relevante.');
+      if(homaRes?.cls) resumo.push(`HOMA-IR: ${fmt(homaRes.homa,2)} (${homaRes.cls}).`);
+      if(paRef) resumo.push(`Referência pressórica pediátrica P90: PAS ${fmt(paRef.sys,0)} / PAD ${fmt(paRef.dia,0)} mmHg.`);
+      const nutriFlags = getNutriFlags(); if(nutriFlags.length) resumo.push('Pontos alimentares fora do adequado: ' + nutriFlags.join('; ') + '.');
+
+      condutas.push('Reforçar abordagem multiprofissional com foco em mudança de estilo de vida.');
+      condutas.push('Orientar atividade física regular, sono adequado e redução de tempo de tela sedentário.');
+      condutas.push('Planejar intervenção nutricional individualizada, com redução de ultraprocessados e ajuste da densidade calórica.');
+      if(imcRef && (imcRef.classificacao === '≥ P95' || imcRef.classificacao === '≥ P97')) condutas.push('IMC compatível com obesidade por percentis: reforçar manejo longitudinal e metas progressivas.');
+      else if(imcRef && imcRef.classificacao === '≥ P90') condutas.push('IMC ≥ P90: valorizar risco metabólico e reforçar intervenção precoce.');
+      if(cor === 'bad'){ condutas.push('Confirmar medidas alteradas em nova avaliação clínica e laboratorial conforme contexto.'); condutas.push('Investigar comorbidades associadas: obesidade, hipertensão, resistência insulínica, DM2, doença hepática gordurosa associada à disfunção metabólica e apneia obstrutiva do sono.'); }
+      if(acantose || (homaRes && /Acima|Resistência|alerta/i.test(homaRes.cls))) condutas.push('Valorizar rastreio de resistência insulínica e evolução glicêmica.');
+      if((num('alt') !== null && num('alt') > 40) || (num('ast') !== null && num('ast') > 40)) condutas.push('Transaminases elevadas: considerar investigação de acometimento hepático metabólico.');
+      if(ronco || pausa) condutas.push('Sintomas de sono presentes: considerar avaliação para distúrbio respiratório do sono.');
+      if(idade >= 10 && idade <=16 && paRef?.acimaP90 === true) condutas.push('PA pediátrica elevada para P90: correlacionar com técnica de medida, repetição seriada e seguimento pressórico.');
+      if(idade > 16 && (((pas ?? 0) >= 130) || ((pad ?? 0) >= 85))) condutas.push('PA elevada para critério metabólico em >16 anos: repetir medidas e seguir investigação/estadiamento.');
+      if(tg !== null && tg >= 150) condutas.push('Triglicerídeos elevados: revisar dieta, excesso calórico, açúcares simples e sedentarismo.');
+      if(hdl !== null && ((idade > 16 && sexo === 'F' && hdl <= 50) || (sexo === 'M' && hdl <= 40) || (idade >=10 && idade <=16 && hdl <= 40))) condutas.push('HDL-c baixo: intensificar atividade física e modificação de padrão alimentar.');
+      if((glic !== null && glic >= 100) || dm2Diag) condutas.push('Alteração glicêmica/DM2: programar seguimento metabólico mais próximo.');
+
+      let html = '';
+      html += cardResult(cor,titulo,diagnostico);
+      html += cardList('Critérios positivos identificados', crit.length ? crit : ['Nenhum critério positivo claramente preenchido até o momento.'], 'neutral');
+      html += cardList('Síntese clínico-metabólica', resumo.length ? resumo : ['Sem destaques adicionais com os dados atuais.'], 'neutral');
+      html += cardList('Condutas iniciais sugeridas', condutas, cor === 'bad' ? 'warn' : 'neutral');
+      if(alertas.length) html += cardList('Pendências para completar o raciocínio diagnóstico', alertas, 'warn');
+      $('saida').innerHTML = html;
+    }
+
+    function limparTudo(){
+      document.querySelectorAll('input').forEach(el => { if(el.type !== 'radio') el.value = ''; });
+      document.querySelectorAll('textarea').forEach(el => el.value = '');
+      document.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+      document.querySelectorAll('input[type="radio"]').forEach(el => { if(el.value === 'Não') el.checked = true; });
+      $('saida').innerHTML=''; ['kpiFaixa','kpiImc','kpiRce','kpiImcClass','kpiHoma','kpiCrit'].forEach(id => $(id).textContent='—');
+    }
+
+    function preencherExemplo(){
+      $('idade').value = 15; $('idadeMeses').value = 180; $('sexo').value = 'M'; $('estagioPuberal').value = 'pub';
+      $('peso').value = 92; $('estatura').value = 168; $('cintura').value = 103; $('raca').value = 'branco';
+      $('tela').value = '6 h/dia'; $('atividade').value = 'Futebol 1x1h/sem';
+      $('alim_prot').value = 'Adequado'; $('alim_carb').value = 'Excesso'; $('alim_lip').value = 'Excesso'; $('alim_vm').value = 'Baixo'; $('alim_agua').value = 'Baixo';
+      $('pas').value = 128; $('pad').value = 84; $('alturaPercentil').value = '50';
+      document.querySelector('input[name="acantose"][value="Sim"]').checked = true; $('tanner1').value = 'G4'; $('tanner2').value = 'P4';
+      $('ct').value = 198; $('hdl').value = 36; $('ldl').value = 118; $('tg').value = 186; $('glicemia').value = 102; $('ast').value = 29; $('alt').value = 46; $('insulina').value = 19.8;
+      document.querySelector('input[name="hfam_dm2"][value="Sim"]').checked = true; document.querySelector('input[name="hfam_has"][value="Sim"]').checked = true; document.querySelector('input[name="sono_ronco"][value="Sim"]').checked = true;
+      calcIMC(); calcRCE(); calcHoma(); calcCAPercentil(); calcPAPercentil(); calcIMCPercentil(); analisar();
+    }
+
+    ['peso','estatura','cintura','glicemia','insulina','pas','pad','idade','idadeMeses'].forEach(id => {
+      $(id).addEventListener('input', () => { calcIMC(); calcRCE(); calcHoma(); calcCAPercentil(); calcPAPercentil(); calcIMCPercentil(); });
+    });
+    ['sexo','raca','alturaPercentil','estagioPuberal'].forEach(id => {
+      $(id).addEventListener('change', () => { calcIMC(); calcRCE(); calcHoma(); calcCAPercentil(); calcPAPercentil(); calcIMCPercentil(); });
+    });
+  </script>
+</body>
+</html>
