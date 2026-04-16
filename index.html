@@ -40,7 +40,7 @@
     .grid-1{grid-template-columns:repeat(4,minmax(0,1fr))}
     .grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
     .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
-    .grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .grid-4{grid-template-columns:repeat(1,minmax(0,1fr))}
     .grid-5{grid-template-columns:repeat(5,minmax(0,1fr))}
     .card{background:var(--pc-white);border:1px solid var(--pc-line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
     .card h2{margin:0;padding:16px 18px;font-size:1rem;font-family:'Comfortaa',sans-serif;color:var(--pc-blue);border-left:6px solid var(--pc-blue);background:#fafcfd}
@@ -79,7 +79,7 @@
     </section>
     <section class="card" style="margin-top:16px;">
         <h2>Identificação</h2>
-        <div class="card-body grid grid-2">
+        <div class="card-body grid grid-4">
           <div class="field"><label for="idade">Idade (anos)</label><input id="idade" type="number" min="0" max="25" step="0.01"></div>
           <div class="field"><label for="idadeMeses">Idade (meses)</label><input id="idadeMeses" type="number" min="0" max="300" step="0.1"></div>
           <div class="field"><label for="sexo">Sexo</label><select id="sexo"><option value="">Selecione</option><option value="M">Masculino</option><option value="F">Feminino</option></select></div>
